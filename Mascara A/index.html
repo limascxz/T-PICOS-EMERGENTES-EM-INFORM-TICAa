@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Cadastro com Máscaras Dinâmicas</title>
+    <style>
+        .erro {
+            color: red;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Formulário de Cadastro</h1>
+    <form id="cadastroForm" action="processa_formulario.php" method="POST">
+        <div>
+            <label for="nome">Nome Completo:</label>
+            <input type="text" id="nome" name="nome" required>
+            <span class="erro" id="erroNome"></span>
+        </div>
+        <br>
+        <div>
+            <label for="cpf">CPF:</label>
+            <input type="text" id="cpf" name="cpf" maxlength="14" required>
+            <span class="erro" id="erroCpf"></span>
+        </div>
+        <br>
+        <div>
+            <label for="telefone">Telefone Celular:</label>
+            <input type="tel" id="telefone" name="telefone" maxlength="15" required>
+            <span class="erro" id="erroTelefone"></span>
+        </div>
+        <br>
+        <div>
+            <label for="data_nascimento">Data de Nascimento:</label>
+            <input type="text" id="data_nascimento" name="data_nascimento" maxlength="10" required>
+            <span class="erro" id="erroDataNascimento"></span>
+        </div>
+        <br>
+        <div>
+            <label for="cep">CEP:</label>
+            <input type="text" id="cep" name="cep" maxlength="9" required>
+            <span class="erro" id="erroCep"></span>
+        </div>
+        <br>
+        <div>
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" required>
+            <span class="erro" id="erroEmail"></span>
+        </div>
+        <br>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        const nomeInput = document.getElementById('nome');
+        const cpfInput = document.getElementById('cpf');
+        const telefoneInput = document.getElementById('telefone');
+        const dataNascimentoInput = document.getElementById('data_nascimento');
+        const cepInput = document.getElementById('cep');
+        const emailInput = document.getElementById('email');
+        const form = document.getElementById('cadastroForm');
+
+        const erroNome = document.getElementById('erroNome');
+        const erroCpf = document.getElementById('erroCpf');
+        const erroTelefone = document.getElementById('erroTelefone');
+        const erroDataNascimento = document.getElementById('erroDataNascimento');
+        const erroCep = document.getElementById('erroCep');
+        const erroEmail = document.getElementById('erroEmail');
+
+        nomeInput.addEventListener('input', () => {
+            nomeInput.value = nomeInput.value.replace(/[^A-Za-z\s]/g, ''); // Permite apenas letras e espaços
+        });
+
+        cpfInput.addEventListener('input', () => {
+            cpfInput.value = cpfInput.value.replace(/\D/g, '') // Remove tudo que não é dígito
+                                     .replace(/(\d{3})(\d)/, '$1.$2') // Coloca um ponto entre o terceiro e o quarto dígitos
+                                     .replace(/(\d{3})(\d)/, '$1.$2') // Coloca um ponto entre o sexto e o sétimo dígitos
+                                     .replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Coloca um hífen entre o nono e os dois últimos dígitos
+        });
+
+        telefoneInput.addEventListener('input', () => {
+            telefoneInput.value = telefoneInput.value.replace(/\D/g, '') // Remove tudo que não é dígito
+                                          .replace(/^(\d{2})(\d)/g, '($1) $2') // Coloca parênteses ao redor dos dois primeiros dígitos
+                                          .replace(/(\d{5})(\d{4})$/, '$1-$2'); // Coloca um hífen entre o quinto e o sexto dígitos
+        });
+
+        dataNascimentoInput.addEventListener('input', () => {
+            dataNascimentoInput.value = dataNascimentoInput.value.replace(/\D/g, '') // Remove tudo que não é dígito
+                                                 .replace(/(\d{2})(\d)/, '$1/$2') // Coloca uma barra entre o segundo e o terceiro dígitos
+                                                 .replace(/(\d{2})(\d)/, '$1/$2') // Coloca uma barra entre o quinto e o sexto dígitos
+                                                 .substring(0, 10); // Limita o tamanho a 10 caracteres
+        });
+
+        cepInput.addEventListener('input', () => {
+            cepInput.value = cepInput.value.replace(/\D/g, '') // Remove tudo que não é dígito
+                                    .replace(/(\d{5})(\d)/, '$1-$2') // Coloca um hífen entre o quinto e o sexto dígitos
+                                    .substring(0, 9); // Limita o tamanho a 9 caracteres
+        });
+
+        form.addEventListener('submit', (event) => {
+            let hasError = false;
+
+            if (nomeInput.value.trim() === '') {
+                erroNome.textContent = 'Por favor, preencha o nome completo.';
+                hasError = true;
+            } else {
+                erroNome.textContent = '';
+            }
+
+            if (cpfInput.value.length < 14) {
+                erroCpf.textContent = 'CPF incompleto.';
+                hasError = true;
+            } else {
+                erroCpf.textContent = '';
+            }
+
+            if (telefoneInput.value.length < 15) {
+                erroTelefone.textContent = 'Telefone incompleto.';
+                hasError = true;
+            } else {
+                erroTelefone.textContent = '';
+            }
+
+            if (dataNascimentoInput.value.length < 10) {
+                erroDataNascimento.textContent = 'Data de nascimento incompleta.';
+                hasError = true;
+            } else {
+                erroDataNascimento.textContent = '';
+            }
+
+            if (cepInput.value.length < 9) {
+                erroCep.textContent = 'CEP incompleto.';
+                hasError = true;
+            } else {
+                erroCep.textContent = '';
+            }
+
+            if (emailInput.value.trim() === '') {
+                erroEmail.textContent = 'Por favor, preencha o e-mail.';
+                hasError = true;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
+                erroEmail.textContent = 'Formato de e-mail inválido.';
+                hasError = true;
+            } else {
+                erroEmail.textContent = '';
+            }
+
+            if (hasError) {
+                event.preventDefault(); // Impede o envio do formulário se houver erros
+            }
+        });
+    </script>
+</body>
+</html>
